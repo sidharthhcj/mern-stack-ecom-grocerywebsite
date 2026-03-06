@@ -17,11 +17,19 @@ const app = express();
 
 await connectCloudinary();
 // allow multiple origins
-const allowedOrigins = ["http://localhost:5173","https://mern-stack-ecom-grocerywebsite.vercel.app"];
-//middlewares
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://mern-stack-ecom-grocerywebsite.vercel.app"
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+}));
+
+app.options("*", cors());
 app.use(cookieParser());
 app.use(express.json());
+
 
 // Api endpoints
 app.use("/images", express.static("uploads"));
