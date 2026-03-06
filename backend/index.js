@@ -3,7 +3,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { connectDB } from "./config/connectDB.js";
-dotenv.config();
+import { connectCloudinary } from "./config/cloudinary.js";
+
 import userRoutes from "./routes/user.routes.js";
 import sellerRoutes from "./routes/seller.routes.js";
 import productRoutes from "./routes/product.routes.js";
@@ -11,25 +12,29 @@ import cartRoutes from "./routes/cart.routes.js";
 import addressRoutes from "./routes/address.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 
-import { connectCloudinary } from "./config/cloudinary.js";
+dotenv.config();
 
 const app = express();
 
 await connectCloudinary();
-// allow multiple origins
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://mern-stack-ecom-grocerywebsite.vercel.app"
-  ],
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://mern-stack-ecom-grocerywebsite.vercel.app"
+];
+
+// CORS middleware
+const corsOptions = {
+  origin: allowedOrigins,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-}));
+};
 
-app.options("*", cors());
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
 app.use(cookieParser());
 app.use(express.json());
-
 
 // Api endpoints
 app.use("/images", express.static("uploads"));
@@ -41,6 +46,7 @@ app.use("/api/address", addressRoutes);
 app.use("/api/order", orderRoutes);
 
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
   connectDB();
   console.log(`Server is running on port ${PORT}`);
