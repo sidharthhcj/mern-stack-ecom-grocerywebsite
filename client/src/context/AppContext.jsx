@@ -19,7 +19,9 @@ export const AppContextProvider = ({ children }) => {
   // check seller status
   const fetchSeller = async () => {
     try {
-      const { data } = await axios.get("/api/seller/is-auth");
+    const { data } = await axios.get("/api/seller/is-auth", {
+withCredentials: true,
+});
       if (data.success) {
         setIsSeller(true);
       } else {
@@ -33,10 +35,12 @@ export const AppContextProvider = ({ children }) => {
   // fetch user auth status ,user Data and cart items
   const fetchUser = async () => {
     try {
-      const { data } = await axios.get("/api/user/is-auth");
+     const { data } = await axios.get("/api/user/is-auth", {
+withCredentials: true,
+});
       if (data.success) {
         setUser(data.user);
-        setCartItems(data.user.cart);
+        setCartItems(data.user.cart||{});
       } else {
         toast.error(data.message);
       }
@@ -93,9 +97,9 @@ export const AppContextProvider = ({ children }) => {
     let totalAmount = 0;
     for (const items in cartItems) {
       let itemInfo = products.find((product) => product._id === items);
-      if (cartItems[items] > 0) {
-        totalAmount += cartItems[items] * itemInfo.offerPrice;
-      }
+     if (itemInfo && cartItems[items] > 0) {
+  totalAmount += cartItems[items] * itemInfo.offerPrice;
+}
     }
     return Math.floor(totalAmount * 100) / 100;
   };
@@ -121,7 +125,11 @@ export const AppContextProvider = ({ children }) => {
   useEffect(() => {
     const updateCart = async () => {
       try {
-        const { data } = await axios.post("/api/cart/update", { cartItems });
+        const { data } = await axios.post(
+  "/api/cart/update",
+  { cartItems },
+  { withCredentials: true }
+);
 
         if (!data.success) {
           toast.error(data.message);
